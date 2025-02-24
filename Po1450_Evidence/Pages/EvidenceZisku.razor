@@ -1,0 +1,16 @@
+﻿@page "/evidence"
+
+<PageTitle>Evidence</PageTitle>
+
+<h1>Evidence!</h1>
+<div class="p-2 border">
+	<label>Datum:<input type="date" @bind="Polozka.Datum"/></label>
+	<label>Náklady:<input type="number" @bind="Polozka.Naklady" /></label>
+	<label>Výnosy:<input type="number" @bind="Polozka.Vynosy" /></label>
+	<label>Popis:<input type="text" @bind="Polozka.Popis" /></label>
+	<button type="button" class="btn btn-success">Přidat</button>
+</div>
+
+@code {
+
+}
