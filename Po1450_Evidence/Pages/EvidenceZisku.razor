@@ -20,19 +20,60 @@
 	}
 </div>
 
-<div class="p-2 border">
-	<button @onclick="Setridit" type="button" class="mx-2 btn btn-primary">Setřídit dle datumu</button>
-	<button @onclick="SetriditSestupne" type="button" class="mx-2 btn btn-primary">Setřídit sestupně dle datumu</button>
+<div class="p-2 my-3 border">
+
+	<div>
+		<button class="btn btn-primary btn-block" @onclick="Setridit" disabled="@(IsNotPolozky || IsEditace)">Setřídit</button>
+		<button class="btn btn-primary btn-block" @onclick="SetriditSestupne" disabled="@(IsNotPolozky || IsEditace)">Setřídit sestupně</button>
+	</div>
+</div>
+<div class="p-2 my-3 border">
+	<button class="btn btn-info" @onclick="ZobrazZaznamy">Zobraz vše</button>
+	<button class="btn btn-info" @onclick="ZobrazPocetZaznamu">Počet záznamů</button>
+	<button class="btn btn-info" @onclick="Statistiky">Statistiky</button>
+</div>
+
+<div class="p-2 my-3 border">
+	<!-- Tato část zobrazuje formátovaný výstup proměnné 'Vypis'. -->
+	<p> @((MarkupString)Vypis!)</p>
 </div>
 <div class="my-2">
+	<div class="p-2 my-3 border" disabled="@IsEditace">
+		<!--  Zaškrtávací políčko pro přepínání viditelnosti filtru dat -->
+		<label>
+			<input type="checkbox" @bind-value="ZobrazenFiltrDat" />
+			Zobrazit filtr dat
+		</label>
+		<!-- Zobrazi se, pokud je zaskrtnuto zobrazit filtr dat -->
+		@if (ZobrazenFiltrDat)
+		{
+			<div>
+				Zisk
+				<select @bind="SelectedFilter">
+					<option value="<">&lt;</option>
+					<option value=">">&gt;</option>
+					<option value="=">=</option>
+				</select>
+				<InputNumber @bind-Value="@FiltrHodnota" />
+				, Popis = <input type="text" @bind=FiltrPopis />
+				<button @onclick="FiltrujPolozky">Filtruj</button>
+			</div>
+		}
+	</div>
+
 	@if (Polozky.Count == 0)
 	{
-		<p>Nejsou zatím žádné seznamy</p>
+		<p>Nejsou zatím žádné záznamy</p>
 	}
 	else
 	{
-		 <table class="table table-striped">
-			 <thead>
+		@* https://www.w3schools.com/bootstrap5/bootstrap_form_check_radio.php *@
+		<div class="form-check form-switch">
+			<input class="form-check-input" type="checkbox" id="mySwitch" name="darkmode" @bind-value="ZobrazitMesičníStatistiky">
+			<label class="form-check-label" for="mySwitch">Měsíční statistiky</label>
+		</div>
+		<table class="table">
+			<thead>
 				<tr>
 					<th>Datum</th>
 					<th>Náklady</th>
@@ -44,27 +85,28 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var item in Polozky)
+				@foreach (var pol in Polozky)
 				{
-					<tr>
-						<td>@item.Datum</td>
-						<td>@item.Naklady</td>
-						<td>@item.Vynosy</td>
-						<td>@item.Zisk</td>
-						<td>@item.Popis</td>
+					<tr class="@GetCssClassForTR(pol)">
+						<td>@pol.Datum</td>
+						<td>@pol.Naklady</td>
+						<td>@pol.Vynosy</td>
+						<td>@pol.Zisk</td>
+						<td>@pol.Popis</td>
 						<td>
-							<button @onclick="()=>SmazatZaznam(item)" type="button" class="btn btn-outline-danger">&times;</button>
+							<button @onclick="()=>SmazatZaznam(pol)" type="button" class="btn btn-outline-danger">&times;</button>
 						</td>
 						<td>
-							<button @onclick="()=>EditujZaznam(item)" type="button" class="btn btn-outline-primary">&plusmn;</button>
+							<button @onclick="()=>EditujZaznam(pol)" type="button" class="btn btn-outline-info">&plusmn;</button>
 						</td>
 					</tr>
 				}
 			</tbody>
-		 </table>
+		</table>
 	}
 </div>
 
 @code {
+	private bool ZobrazitMesičníStatistiky { get; set; } = false;
 
 }
