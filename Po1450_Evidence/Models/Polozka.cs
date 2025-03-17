@@ -28,6 +28,9 @@
 		/// </summary>
 		public string ZiskHtml => (Zisk > 0) ? $"<span style=\"color:green;\"> {Zisk:C2} </span >" : $"<span style=\"color:red;\"> {Zisk:C2} </span >"; //Ternární operátor
 
-
+		public override string ToString()
+		{
+			return $"{Datum} - Nákladu: {Naklady:C2} - Výnosy: {Vynosy:C2} - Zisk:{ZiskHtml} - {Popis}";
+		}
 	}
 }

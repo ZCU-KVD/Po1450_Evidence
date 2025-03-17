@@ -1,9 +1,18 @@
 ﻿using Microsoft.JSInterop;
+using System.Globalization;
 
 namespace Po1450_Evidence.Pages
 {
 	public partial class EvidenceZisku
 	{
+		#region Udalosti formulare
+		protected override void OnInitialized()
+		{
+			base.OnInitialized();
+			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("cs-CZ");
+		}
+		#endregion
+
 		#region Vlastnosti
 		public List<Models.Polozka> Polozky { get; private set; } = new List<Models.Polozka>();
 		private Models.Polozka Polozka { get; set; } = new Models.Polozka();
@@ -46,6 +55,24 @@ namespace Po1450_Evidence.Pages
 		/// Textový filtr pro porovnávání s obsahem popisu položek.
 		/// </summary>
 		public string FiltrPopis { get; set; } = "";
+
+		private List<Models.Polozka> PolozkyFiltr { get; set; } = new List<Models.Polozka>();
+
+		private List<Models.Polozka> PolozkySeskupene => Polozky.OrderBy(x => x.Datum)
+			.GroupBy(g=> new { g.Datum.Year, g.Datum.Month})
+			.Select(x=> new Models.Polozka(new DateOnly(x.Key.Year, x.Key.Month,1), 
+				x.Sum(y=>y.Naklady), x.Sum(y=>y.Vynosy), 
+				string.Join(", ",x.Select(y=>y.Popis)))).ToList();
+		
+		private List<Models.Polozka> PolozkySeskupeneV2 => (from p in Polozky
+															group p by new { p.Datum.Year, p.Datum.Month } into g
+															orderby g.Key.Year, g.Key.Month
+															select new Models.Polozka(new DateOnly(g.Key.Year, g.Key.Month, 1),
+																g.Sum(y => y.Naklady), g.Sum(y => y.Vynosy),
+																string.Join(", ", g.Select(y => y.Popis)))
+															).ToList();
+															
+
 		#endregion
 
 		#region Metody
@@ -174,7 +201,28 @@ namespace Po1450_Evidence.Pages
 		/// </summary>
 		public void FiltrujPolozky()
 		{
+			switch (SelectedFilter)
+			{
+				case "<":
+					PolozkyFiltr = Polozky.Where(x => x.Zisk < FiltrHodnota).ToList();
+					break;
+				case ">":
+					PolozkyFiltr = Polozky.Where(x => x.Zisk > FiltrHodnota).ToList();
+					break;
+				case "=":
+					PolozkyFiltr = Polozky.Where(x => x.Zisk == FiltrHodnota).ToList();
+					break;
 
+				default:
+					break;
+			}
+
+			if (!string.IsNullOrEmpty(FiltrPopis))
+			{
+				PolozkyFiltr = PolozkyFiltr.Where(x => 
+					x.Popis.Contains(FiltrPopis, StringComparison.OrdinalIgnoreCase)).ToList();
+			}
+			
 		}
 		#endregion
 

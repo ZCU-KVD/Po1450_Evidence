@@ -61,7 +61,7 @@
 		}
 	</div>
 
-	@if (Polozky.Count == 0)
+	@if (ZobrazenFiltrDat ? PolozkyFiltr.Count == 0 : Polozky.Count == 0)
 	{
 		<p>Nejsou zatím žádné záznamy</p>
 	}
@@ -85,7 +85,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var pol in Polozky)
+				@foreach (var pol in ZobrazitMesičníStatistiky ? PolozkySeskupeneV2 : ZobrazenFiltrDat ? PolozkyFiltr : Polozky)
 				{
 					<tr class="@GetCssClassForTR(pol)">
 						<td>@pol.Datum</td>
